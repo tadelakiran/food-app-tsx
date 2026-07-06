@@ -8,6 +8,7 @@ import Fruits from './components/Fruits';
 import Grocery from './components/Grocery';
 import Vegetable from './components/Vegetable';
 import { FcHome, FcGallery } from 'react-icons/fc';
+import Register from './components/Register';
 
 function App() {
   return (
@@ -72,6 +73,12 @@ function App() {
             >
               🛒 Grocery
             </NavLink>
+             <NavLink
+              to="/register"
+              className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+            >
+              🤵 Register
+            </NavLink>
           </div>
         </nav>
 
@@ -84,6 +91,7 @@ function App() {
             <Route path="/fruits" element={<Fruits />} />
             <Route path="/grocery" element={<Grocery />} />
             <Route path="/vegetable" element={<Vegetable />} />
+            <Route path="/register" element={<Register />} />
           </Routes>
         </main>
       </div>
