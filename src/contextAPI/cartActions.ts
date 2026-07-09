@@ -2,76 +2,40 @@ import type { CartItem } from "../interfaces/CartItem";
 import type { Product } from "../interfaces/Product";
 
 export const addToCart = (draft: CartItem[], product: Product) => {
-
-    const item = draft.find(x => x.id === product.id);
+    const item = draft.find((x) => x.id === product.id);
 
     if (item) {
-
-        item.quantity++;
-
+        item.quantity += 1;
     } else {
-
         draft.push({
-            ...product,
-            quantity: 1
+            ...product,      // ← spreads all Product fields including category
+            quantity: 1,
         });
-
     }
-
 };
 
 export const removeFromCart = (draft: CartItem[], id: number) => {
-
-    const index = draft.findIndex(x => x.id === id);
-
-    if (index !== -1) {
-
-        draft.splice(index, 1);
-
-    }
+    const index = draft.findIndex((x) => x.id === id);
+    if (index !== -1) draft.splice(index, 1);
 };
-
-
 
 export const increaseQuantity = (draft: CartItem[], id: number) => {
-
-    const item = draft.find(x => x.id === id);
-
-    if (item) {
-
-        item.quantity++;
-
-    }
-
+    const item = draft.find((x) => x.id === id);
+    if (item) item.quantity += 1;
 };
 
-
-
-
 export const decreaseQuantity = (draft: CartItem[], id: number) => {
-
-    const item = draft.find(x => x.id === id);
-
+    const item = draft.find((x) => x.id === id);
     if (!item) return;
 
     if (item.quantity > 1) {
-
-        item.quantity--;
-
+        item.quantity -= 1;
     } else {
-
-        const index = draft.findIndex(x => x.id === id);
-
-        draft.splice(index, 1);
-
+        const index = draft.findIndex((x) => x.id === id);
+        if (index !== -1) draft.splice(index, 1);
     }
-
 };
 
-
-
 export const clearCart = (draft: CartItem[]) => {
-
     draft.length = 0;
-
 };

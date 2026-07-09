@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { useImmer } from "use-immer";
-
 import type { CartItem } from "../interfaces/CartItem";
 import {
   addToCart,
@@ -22,17 +21,12 @@ export function CartProvider({ children }: CartProviderProps) {
     <CartContext.Provider
       value={{
         cart,
-
         addToCart: (product) => setCart((draft) => addToCart(draft, product)),
-
         removeFromCart: (id) => setCart((draft) => removeFromCart(draft, id)),
-
         increaseQuantity: (id) =>
           setCart((draft) => increaseQuantity(draft, id)),
-
         decreaseQuantity: (id) =>
           setCart((draft) => decreaseQuantity(draft, id)),
-
         clearCart: () => setCart((draft) => clearCart(draft)),
       }}
     >
@@ -40,6 +34,3 @@ export function CartProvider({ children }: CartProviderProps) {
     </CartContext.Provider>
   );
 }
-
-
-
