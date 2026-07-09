@@ -11,8 +11,10 @@ import Checkout from "./components/Checkout";
 import Register from "./components/Register";
 import { FcHome, FcGallery } from "react-icons/fc";
 import { FaShoppingCart } from 'react-icons/fa';
+import { CartContext } from "./contextAPI/CartContext";
 
 function App() {
+  
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-slate-50">
@@ -136,7 +138,7 @@ function App() {
                 }
               >
                 <span className="inline-flex items-center gap-2">
-                  <FaShoppingCart /> Cart
+                  <FaShoppingCart /> Cart {}
                 </span>
               </NavLink>
 
