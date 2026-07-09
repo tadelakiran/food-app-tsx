@@ -7,7 +7,7 @@ import Fruits from "./components/Fruits";
 import Grocery from "./components/Grocery";
 import Vegetable from "./components/Vegetable";
 import Cart from "./components/Cart";
-// import Checkout from "./components/Checkout";
+import Checkout from "./components/Checkout";
 import Register from "./components/Register";
 import { FcHome, FcGallery } from "react-icons/fc";
 import { FaShoppingCart } from 'react-icons/fa';
@@ -166,7 +166,7 @@ function App() {
             <Route path="/grocery" element={<Grocery />} />
             <Route path="/vegetable" element={<Vegetable />} />
             <Route path="/cart" element={<Cart />} />
-            {/* <Route path="/checkout" element={<Checkout />} /> */}
+            <Route path="/checkout" element={<Checkout />} />
             <Route path="/register" element={<Register />} />
           </Routes>
         </main>

@@ -3,15 +3,15 @@ import type { Coupon } from "../interfaces/Coupon";
 
 export const coupons: Coupon[] = [
   {
-    code: "SAVE10",
+    code: "KIRAN10",
     discount: 10,
   },
   {
-    code: "SAVE20",
+    code: "KRISHNA20",
     discount: 20,
   },
   {
-    code: "SAVE30",
+    code: "SAI30",
     discount: 30,
   },
   {

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaMoneyBillWave,
@@ -7,8 +7,12 @@ import {
   FaTrash,
   FaPlus,
   FaMinus,
+  FaTicketAlt,
 } from "react-icons/fa";
 import { CartContext } from "../contextAPI/CartContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { coupons } from "../data/Coupons";
 
 function Cart() {
   const {
@@ -19,11 +23,44 @@ function Cart() {
   } = useContext(CartContext);
 
   const navigate = useNavigate();
+  const couponRef = useRef<HTMLInputElement>(null);
+
+  const [couponPercent, setCouponPercent] = useState(0);
+  const [message, setMessage] = useState("");
+
+  const applyCoupon = () => {
+    const couponCode = couponRef.current?.value.trim() || "";
+
+    if (!couponCode) {
+      toast.warning("Please enter a coupon code.");
+      setCouponPercent(0);
+      setMessage("Please enter a coupon code.");
+      return;
+    }
+
+    const coupon = coupons.find(
+      (c) => c.code.toUpperCase() === couponCode.toUpperCase()
+    );
+
+    if (coupon) {
+      setCouponPercent(coupon.discount);
+      setMessage(`🎉 Coupon Applied (${coupon.discount}% OFF)`);
+      toast.success(
+        `Coupon Applied Successfully (${coupon.discount}% OFF)`
+      );
+    } else {
+      setCouponPercent(0);
+      setMessage("❌ Invalid Coupon Code");
+      toast.error("Invalid Coupon Code");
+    }
+  };
 
   const grandTotal = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
+  const discount = (grandTotal * couponPercent) / 100;
+  const finalAmount = grandTotal - discount;
 
   const renderImage = (image: string, name: string) => (
     <img
@@ -35,6 +72,8 @@ function Cart() {
 
   return (
     <div className="min-h-screen bg-slate-100 p-8">
+      <ToastContainer position="top-right" autoClose={3000} />
+      
       <h1 className="mb-10 text-center text-4xl font-bold text-emerald-700">
         🛒 My Shopping Cart
       </h1>
@@ -91,7 +130,7 @@ function Cart() {
                   </div>
                 </div>
 
-                {/* Quantity */}
+                {/* Quantity Controls */}
                 <div className="flex flex-col items-center gap-4">
                   <div className="flex items-center gap-3 rounded-full bg-slate-100 p-2">
                     <button
@@ -134,44 +173,86 @@ function Cart() {
               </h2>
             </div>
 
+            {/* Coupon Section */}
+            <div className="mb-6 flex gap-3">
+              <div className="relative flex-1">
+                <input
+                  ref={couponRef}
+                  type="text"
+                  placeholder="Enter Coupon Code"
+                  className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-emerald-500"
+                />
+              </div>
+              <button
+                onClick={applyCoupon}
+                className="rounded-xl bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+              >
+                Apply
+              </button>
+            </div>
+
+            {message && (
+              <p
+                className={`mb-5 font-semibold ${
+                  couponPercent > 0 ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {message}
+              </p>
+            )}
+
             <div className="space-y-5">
+              {/* Grand Total (before discount) */}
               <div className="flex items-center justify-between rounded-3xl bg-slate-50 px-4 py-4">
                 <div className="flex items-center gap-2 text-slate-700">
                   <FaMoneyBillWave className="text-emerald-600" />
                   <span>Grand Total</span>
                 </div>
-
-                <span className="font-bold">
-                  ₹{grandTotal.toFixed(2)}
-                </span>
+                <span className="font-bold">₹{grandTotal.toFixed(2)}</span>
               </div>
 
+              {/* Discount Display (shown only when coupon applied) */}
+              {couponPercent > 0 && (
+                <div className="flex items-center justify-between rounded-3xl bg-blue-50 px-4 py-4">
+                  <div className="flex items-center gap-2 text-slate-700">
+                    <FaTicketAlt className="text-blue-600" />
+                    <span>Discount ({couponPercent}%)</span>
+                  </div>
+                  <span className="font-bold text-blue-600">
+                    -₹{discount.toFixed(2)}
+                  </span>
+                </div>
+              )}
+
+              {/* Final Payable Amount */}
               <div className="rounded-3xl bg-emerald-50 px-4 py-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 font-bold text-slate-900">
                     <FaCheckCircle className="text-blue-600" />
                     <span>Payable Amount</span>
                   </div>
-
                   <span className="text-3xl font-bold text-emerald-700">
-                    ₹{grandTotal.toFixed(2)}
+                    ₹{finalAmount.toFixed(2)}
                   </span>
                 </div>
               </div>
-            </div>
 
-            <button
-              onClick={() =>
-                navigate("/checkout", {
-                  state: {
-                    grandTotal,
-                  },
-                })
-              }
-              className="mt-8 w-full rounded-3xl bg-emerald-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-emerald-700"
-            >
-              Proceed to Checkout
-            </button>
+              <button
+                onClick={() =>
+                  navigate("/checkout", {
+                    state: {
+                      grandTotal,
+                      discount,
+                      finalAmount,
+                      couponPercent,
+                    },
+                  })
+                }
+                className="mt-8 w-full rounded-3xl bg-emerald-600 px-6 py-4 text-base font-semibold text-white transition hover:bg-emerald-700"
+              >
+                Proceed to Checkout
+              </button>
+            </div>
           </aside>
         </div>
       )}

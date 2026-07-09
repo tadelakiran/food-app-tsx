@@ -1,94 +1,369 @@
+import { useContext, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+// import { CartContext } from "./contextapi/CartContext";
+import { CartContext } from "../contextAPI/CartContext";
+import {
+  FaMapMarkerAlt,
+  FaUser,
+  FaPhone,
+  FaMoneyBillWave,
+  FaQrcode,
+  FaTruck,
+  FaCheckCircle,
+  FaShieldAlt,
+  FaTag,
+  FaShoppingBag,
+  FaArrowLeft,
+} from "react-icons/fa";
 
 function Checkout() {
+  const { cart, clearCart } = useContext(CartContext);
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as
-    | {
-        grandTotal: number;
-        discount: number;
-        finalAmount: number;
-        couponPercent: number;
-      }
-    | null;
 
-  if (!state) {
-    return (
-      <div className="min-h-screen bg-slate-100 p-8">
-        <div className="mx-auto max-w-3xl rounded-3xl bg-white p-10 shadow-xl text-center">
-          <h1 className="text-3xl font-bold text-slate-900 mb-4">
-            No checkout data found
-          </h1>
-          <p className="text-slate-600 mb-6">
-            Please add items to cart and return to checkout.
-          </p>
-          <button
-            onClick={() => navigate("/cart")}
-            className="rounded-full bg-emerald-600 px-8 py-3 text-white font-semibold hover:bg-emerald-700 transition"
-          >
-            Back to Cart
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const {
+    grandTotal = 0,
+    discount = 0,
+    finalAmount = 0,
+    couponPercent = 0,
+  } = location.state || {};
+
+  const [name, setName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [address, setAddress] = useState("");
+  const [paymentMode, setPaymentMode] = useState("");
+  const [isPlacing, setIsPlacing] = useState(false);
+
+  const placeOrder = () => {
+    if (!name.trim() || !mobile.trim() || !address.trim()) {
+      alert("Please fill all address details.");
+      return;
+    }
+    if (!paymentMode) {
+      alert("Please select a payment method.");
+      return;
+    }
+
+    setIsPlacing(true);
+    setTimeout(() => {
+      alert("Order Placed Successfully! 🎉");
+      clearCart();
+      navigate("/cart");
+    }, 800);
+  };
+
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="min-h-screen bg-slate-100 p-8">
-      <div className="mx-auto max-w-4xl rounded-[2rem] bg-white p-10 shadow-2xl">
-        <div className="mb-10 flex flex-col gap-4">
-          <span className="inline-flex rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold uppercase tracking-[0.24em] text-emerald-700">
-            Checkout
-          </span>
-          <h1 className="text-5xl font-bold text-slate-900">
-            Ready to place your order
-          </h1>
-          <p className="max-w-2xl text-slate-600">
-            Review your totals and confirm payment to complete the order.
-          </p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          <div className="rounded-3xl bg-slate-50 p-6">
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
-              Subtotal
-            </p>
-            <p className="mt-4 text-3xl font-bold text-slate-900">
-              ₹{state.grandTotal.toFixed(2)}
-            </p>
-          </div>
-          <div className="rounded-3xl bg-slate-50 p-6">
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
-              Discount
-            </p>
-            <p className="mt-4 text-3xl font-bold text-rose-600">
-              ₹{state.discount.toFixed(2)}
-            </p>
-          </div>
-          <div className="rounded-3xl bg-slate-50 p-6">
-            <p className="text-sm uppercase tracking-[0.2em] text-slate-500">
-              Payable
-            </p>
-            <p className="mt-4 text-3xl font-bold text-emerald-700">
-              ₹{state.finalAmount.toFixed(2)}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-10 rounded-[2rem] border border-slate-200 bg-slate-50 p-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-4">
-            Complete your purchase
-          </h2>
-          <p className="text-slate-600 mb-8">
-            We will redirect you to payment once you confirm your order.
-          </p>
-
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4">
           <button
-            onClick={() => navigate("/")}
-            className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-8 py-4 text-base font-semibold text-white transition hover:bg-emerald-700"
+            onClick={() => navigate("/cart")}
+            className="p-2 rounded-full hover:bg-slate-100 transition-colors text-slate-600"
           >
-            Confirm and Place Order
+            <FaArrowLeft className="text-lg" />
           </button>
+          <h1 className="text-xl font-bold text-slate-900">Checkout</h1>
+          <div className="ml-auto flex items-center gap-2 text-sm text-slate-500">
+            <FaShieldAlt className="text-emerald-500" />
+            <span>Secure Checkout</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Left Column - Forms */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Delivery Address */}
+            <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                  <FaMapMarkerAlt className="text-red-500 text-sm" />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900">
+                  Delivery Address
+                </h2>
+              </div>
+
+              <div className="p-6 space-y-5">
+                <div className="grid sm:grid-cols-2 gap-5">
+                  {/* Name */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <FaUser className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="John Doe"
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-slate-900 placeholder:text-slate-400"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Mobile */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700">
+                      Mobile Number <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <FaPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="tel"
+                        value={mobile}
+                        onChange={(e) => setMobile(e.target.value)}
+                        placeholder="+91 98765 43210"
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-slate-900 placeholder:text-slate-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700">
+                    Complete Address <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="House no, Street, City, State, PIN code"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-slate-900 placeholder:text-slate-400 resize-none"
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* Payment Method */}
+            <section className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+              <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                  <FaMoneyBillWave className="text-blue-500 text-sm" />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900">
+                  Payment Method
+                </h2>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {/* UPI Option */}
+                <label
+                  className={`relative flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    paymentMode === "UPI"
+                      ? "border-blue-500 bg-blue-50/50"
+                      : "border-slate-200 hover:border-slate-300 bg-white"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="UPI"
+                    checked={paymentMode === "UPI"}
+                    onChange={(e) => setPaymentMode(e.target.value)}
+                    className="w-4 h-4 text-blue-600 accent-blue-600"
+                  />
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                    <FaQrcode className="text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <span className="font-semibold text-slate-900 block">
+                      UPI Payment
+                    </span>
+                    <span className="text-sm text-slate-500">
+                      PhonePe, GPay, Paytm
+                    </span>
+                  </div>
+                  {paymentMode === "UPI" && (
+                    <FaCheckCircle className="text-blue-500 text-xl" />
+                  )}
+                </label>
+
+                {/* UPI QR Display */}
+                {paymentMode === "UPI" && (
+                  <div className="mt-2 bg-blue-50 rounded-xl p-6 text-center border border-blue-100 animate-fade-in">
+                    <div className="bg-white p-4 rounded-xl inline-block shadow-sm">
+                      <img
+                        src="/images/qr.png"
+                        alt="UPI QR Code"
+                        className="w-48 h-48 object-contain"
+                      />
+                    </div>
+                    <p className="mt-3 text-sm font-medium text-slate-600">
+                      Scan QR using any UPI app
+                    </p>
+                  </div>
+                )}
+
+                {/* COD Option */}
+                <label
+                  className={`relative flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                    paymentMode === "COD"
+                      ? "border-emerald-500 bg-emerald-50/50"
+                      : "border-slate-200 hover:border-slate-300 bg-white"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="COD"
+                    checked={paymentMode === "COD"}
+                    onChange={(e) => setPaymentMode(e.target.value)}
+                    className="w-4 h-4 text-emerald-600 accent-emerald-600"
+                  />
+                  <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+                    <FaTruck className="text-emerald-600" />
+                  </div>
+                  <div className="flex-1">
+                    <span className="font-semibold text-slate-900 block">
+                      Cash on Delivery
+                    </span>
+                    <span className="text-sm text-slate-500">
+                      Pay when you receive
+                    </span>
+                  </div>
+                  {paymentMode === "COD" && (
+                    <FaCheckCircle className="text-emerald-500 text-xl" />
+                  )}
+                </label>
+
+                {/* COD Info */}
+                {paymentMode === "COD" && (
+                  <div className="mt-2 bg-emerald-50 rounded-xl p-4 border border-emerald-100 flex items-center gap-3 animate-fade-in">
+                    <FaTruck className="text-emerald-500 shrink-0" />
+                    <p className="text-sm text-emerald-800">
+                      Cash will be collected by our delivery partner at your doorstep.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </section>
+          </div>
+
+          {/* Right Column - Order Summary */}
+          <aside className="lg:col-span-1">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 sticky top-24 overflow-hidden">
+              <div className="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center">
+                  <FaShoppingBag className="text-emerald-500 text-sm" />
+                </div>
+                <h2 className="text-lg font-bold text-slate-900">
+                  Order Summary
+                </h2>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {/* Items Count */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-600 flex items-center gap-2">
+                    <FaShoppingBag className="text-slate-400" />
+                    Total Items
+                  </span>
+                  <span className="font-semibold text-slate-900 bg-slate-100 px-2 py-1 rounded-lg">
+                    {totalItems}
+                  </span>
+                </div>
+
+                {/* Divider */}
+                <div className="h-px bg-slate-100" />
+
+                {/* Grand Total */}
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-600 flex items-center gap-2">
+                    <FaMoneyBillWave className="text-emerald-500" />
+                    Grand Total
+                  </span>
+                  <span className="font-semibold text-slate-900">
+                    ₹{grandTotal.toFixed(2)}
+                  </span>
+                </div>
+
+                {/* Discount */}
+                {couponPercent > 0 && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-slate-600 flex items-center gap-2">
+                      <FaTag className="text-blue-500" />
+                      Coupon ({couponPercent}% OFF)
+                    </span>
+                    <span className="font-semibold text-red-500">
+                      -₹{discount.toFixed(2)}
+                    </span>
+                  </div>
+                )}
+
+                {/* Savings Badge */}
+                {couponPercent > 0 && (
+                  <div className="bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2 flex items-center gap-2">
+                    <FaTag className="text-emerald-500 text-xs" />
+                    <span className="text-xs font-medium text-emerald-700">
+                      You saved ₹{discount.toFixed(2)} on this order
+                    </span>
+                  </div>
+                )}
+
+                {/* Divider */}
+                <div className="h-px bg-slate-100" />
+
+                {/* Final Amount */}
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-lg font-bold text-slate-900">
+                    Payable Amount
+                  </span>
+                  <span className="text-2xl font-bold text-emerald-600">
+                    ₹{finalAmount.toFixed(2)}
+                  </span>
+                </div>
+
+                {/* Place Order Button */}
+                <button
+                  onClick={placeOrder}
+                  disabled={isPlacing}
+                  className="mt-4 w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-xl flex justify-center items-center gap-2 transition-all shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30 active:scale-[0.98]"
+                >
+                  {isPlacing ? (
+                    <span className="flex items-center gap-2">
+                      <svg
+                        className="animate-spin h-5 w-5"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                          fill="none"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Processing...
+                    </span>
+                  ) : (
+                    <>
+                      <FaCheckCircle />
+                      Place Order
+                    </>
+                  )}
+                </button>
+
+                <p className="text-xs text-center text-slate-400 flex items-center justify-center gap-1">
+                  <FaShieldAlt />
+                  Secure SSL Encryption
+                </p>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     </div>
