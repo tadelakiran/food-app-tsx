@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import Home from "./components/Home";
-import Veg from "./components/Veg";
+// import Veg from "./components/Veg";
 import NonVeg from "./components/NonVeg";
 import Milk from "./components/Milk";
 import Fruits from "./components/Fruits";
@@ -9,7 +9,7 @@ import Vegetable from "./components/Vegetable";
 import Cart from "./components/Cart";
 import Checkout from "./components/Checkout";
 import Register from "./components/Register";
-import { FcHome, FcGallery } from "react-icons/fc";
+import { FcHome } from "react-icons/fc";
 import { FaShoppingCart } from 'react-icons/fa';
 import Orders from "./components/Order";
 import { useContext } from "react";
