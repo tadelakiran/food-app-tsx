@@ -18,9 +18,13 @@ import {
 import QRCode from "react-qr-code";
 import { sendOrderEmail } from "../services/emailService";
 import { getAddressFromLocation } from "../apis/LocationApi";
+// import { addOrder } from "../contextAPI/OrderActions";
+import { OrderContext } from "../contextAPI/OrderContext";
+import Swal from "sweetalert2";
 
 function Checkout() {
   const { cart, clearCart } = useContext(CartContext);
+  const {addOrder} = useContext(OrderContext)
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -57,14 +61,48 @@ function Checkout() {
   // };
   const placeOrder = async () => {
     if (!name || !mobile || !address) {
-      alert("Please fill all address details.");
+       await Swal.fire({
+    icon: "warning",
+    title: "Missing Details",
+    text: "Please fill all address details.",
+    confirmButtonColor: "#f59e0b",
+    confirmButtonText: "OK",
+  });
       return;
     }
     if (!paymentMode) {
-      alert("Please select a payment method.");
+      await Swal.fire({
+    icon: "warning",
+    title: "Payment Required",
+    text: "Please select a payment method.",
+    confirmButtonColor: "#f59e0b",
+    confirmButtonText: "OK",
+  });
       return;
     }
-    alert("Order Placed Successfully!");
+    // alert("Order Placed Successfully!");
+   await Swal.fire({
+  title: "🎉 Order Placed Successfully!",
+  html: `
+    <h3>Thank you for your purchase!</h3>
+    <p>Your order has been placed successfully.</p>
+  `,
+  icon: "success",
+  width: 650,
+  padding: "2em",
+  color: "#166534",
+  background: "#fff",
+  confirmButtonText: "View Orders",
+  confirmButtonColor: "#10b981",
+   timer: 5000, 
+  timerProgressBar: true,
+  backdrop: `
+    rgba(0,0,123,0.4)
+    url("https://sweetalert2.github.io/images/nyan-cat.gif")
+    left top
+    no-repeat
+  `,
+});
 
     //prepare the email information 
     // Map the template params & our Data.
@@ -90,9 +128,36 @@ function Checkout() {
     };
 
     await sendOrderEmail(order);
+        const orderData = {
+      orderNumber: Math.floor(Math.random() * 100000),
+
+      customerName: name,
+
+      mobile: mobile,
+
+      email: email,
+
+      address: address,
+
+      paymentMode: paymentMode,
+
+      grandTotal: grandTotal,
+
+      discount: discount,
+
+      finalAmount: finalAmount,
+
+      orderDate: new Date().toLocaleString(),
+
+      status: "PLACED",
+
+      items: [...cart],
+    };
+
+    addOrder(orderData);
 
     clearCart();
-    navigate("/cart");
+    navigate("/orders");
   };
 
 

@@ -5,11 +5,14 @@ import './index.css'
 
 import App from './App.tsx'
 import { CartProvider } from "./contextAPI/CartProvider";
+import { OrderProvider } from './contextAPI/OrderProvider.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <CartProvider>
+    <OrderProvider>
+      <CartProvider>
          <App />
     </CartProvider>
+    </OrderProvider>
   </StrictMode>,
 )

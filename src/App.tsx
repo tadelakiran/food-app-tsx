@@ -11,10 +11,13 @@ import Checkout from "./components/Checkout";
 import Register from "./components/Register";
 import { FcHome, FcGallery } from "react-icons/fc";
 import { FaShoppingCart } from 'react-icons/fa';
+import Orders from "./components/Order";
+import { useContext } from "react";
 import { CartContext } from "./contextAPI/CartContext";
+// import { CartContext } from "./contextAPI/CartContext";
 
 function App() {
-  
+   let {cart}=  useContext(CartContext)
   return (
     <BrowserRouter>
       <div className="min-h-screen bg-slate-50">
@@ -47,7 +50,7 @@ function App() {
                 </span>
               </NavLink>
 
-              <NavLink
+              {/* <NavLink
                 to="/veg"
                 className={({ isActive }) =>
                   `rounded-full px-4 py-2 text-sm font-semibold transition ${
@@ -60,7 +63,7 @@ function App() {
                 <span className="inline-flex items-center gap-2">
                   <FcGallery /> Veg
                 </span>
-              </NavLink>
+              </NavLink> */}
 
               <NavLink
                 to="/non-veg"
@@ -126,6 +129,18 @@ function App() {
               >
                 🛒 Grocery
               </NavLink>
+                 <NavLink
+                to="/orders"
+                className={({ isActive }) =>
+                  `rounded-full px-4 py-2 text-sm font-semibold transition ${
+                    isActive
+                      ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                      : "text-slate-700 hover:bg-slate-100"
+                  }`
+                }
+              >
+                 Orders
+              </NavLink>
 
               <NavLink
                 to="/cart"
@@ -138,7 +153,7 @@ function App() {
                 }
               >
                 <span className="inline-flex items-center gap-2">
-                  <FaShoppingCart /> Cart {}
+                  <FaShoppingCart /> Cart ({cart.length})
                 </span>
               </NavLink>
 
@@ -161,12 +176,13 @@ function App() {
         <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/veg" element={<Veg />} />
+            {/* <Route path="/veg" element={<Veg />} /> */}
             <Route path="/non-veg" element={<NonVeg />} />
             <Route path="/milk" element={<Milk />} />
             <Route path="/fruits" element={<Fruits />} />
             <Route path="/grocery" element={<Grocery />} />
             <Route path="/vegetable" element={<Vegetable />} />
+            <Route path="/orders" element={<Orders />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/register" element={<Register />} />
